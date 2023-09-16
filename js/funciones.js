@@ -128,7 +128,7 @@ export function agregarJugador(){
         mostrarJugadores();
     }
 
-    fetch("../db/jugadoresDB.json")
+    fetch("https://raw.githubusercontent.com/SantiagoRibot96/javaScript-simuladorDeFulbito/master/db/jugadoresDB.json")
         .then((response) => response.json())
             .then((data) => {
                 data.forEach((item) => {
