@@ -1,0 +1,4 @@
+.contenedorProductos {
+    display: flex;
+    justify-content: space-around;
+}
