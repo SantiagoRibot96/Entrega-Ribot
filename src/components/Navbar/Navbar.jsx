@@ -11,10 +11,13 @@ const Navbar = () => {
                 <div className="centrado" id="navbarNav">
                     <ul className="navbar-nav">
                         <li className="nav-item">
-                            <NavLink className="nav-link navbar-brand" to="categoria/carbon">Carbon</NavLink>
+                            <NavLink className="nav-link navbar-brand" to="categoria/Carbon">Carbon</NavLink>
                         </li>
                         <li className="nav-item">
-                            <NavLink className="nav-link navbar-brand" to="categoria/gas">Gas</NavLink>
+                            <NavLink className="nav-link navbar-brand" to="categoria/Gas">Gas</NavLink>
+                        </li>
+                        <li className="nav-item">
+                            <NavLink className="nav-link navbar-brand" to="categoria/Accesorios">Accesorios</NavLink>
                         </li>
                         <li className="nav-item">
                             <NavLink className="nav-link"> <CartWidget/> </NavLink>

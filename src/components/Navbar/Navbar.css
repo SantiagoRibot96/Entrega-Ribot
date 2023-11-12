@@ -1,12 +1,8 @@
-.centrado{
-    display: flex;
-    justify-content: end;
-}
-
 .centrado ul{
     flex-direction: row;
     width: 30vw;
     justify-content: end;
+    align-items: center;
 }
 
 .centrado ul li{
