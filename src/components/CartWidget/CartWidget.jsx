@@ -9,7 +9,7 @@ const CartWidget = () => {
   return (
     <div>
       <Link to = "/cart" className='btn'>
-        <img className="carritoDeCompras" src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Carrito" />
+        <img className="carritoDeCompras" src="../../3144456.png" alt="Carrito" />
         {
           total > 0 && <strong> {total} </strong>
         }

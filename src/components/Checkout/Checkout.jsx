@@ -4,6 +4,7 @@ import { db } from "../../services/config";
 import { collection, addDoc, updateDoc, doc, getDoc } from "firebase/firestore";
 import { useContext } from "react";
 import { Link } from 'react-router-dom';
+import './Checkout.css'
 
 const Checkout = () => {
   const [nombre, setNombre] = useState("");
@@ -13,6 +14,7 @@ const Checkout = () => {
   const [emailConfirmacion, setEmailConfirmacion] = useState("");
   const [error, setError] = useState("");
   const [orderId, setOrderId] = useState("");
+  const [comentarios, setComentarios] = useState("");
 
   const { carrito, vaciarCarrito, total, cantidadTotal } = useContext(CarritoContext);
 
@@ -40,7 +42,8 @@ const Checkout = () => {
       nombre,
       apellido,
       telefono,
-      email
+      email,
+      comentarios
     };
 
     Promise.all(
@@ -60,6 +63,12 @@ const Checkout = () => {
             setOrderId(docRef.id);
             vaciarCarrito();
             setError("");
+            setNombre("");
+            setApellido("");
+            setTelefono("");
+            setEmail("");
+            setEmailConfirmacion("");
+            setComentarios("");
           })
           .catch(error => {
             setError("Error al crear la orden ", error);
@@ -71,50 +80,70 @@ const Checkout = () => {
   }
 
   return (
-    <div>
+    <>
       <h2>Checkout</h2>
 
-      <form onSubmit={manejadorFormulario}>
-        {
-          carrito.map(producto => (
-            <div key={producto.item.id}>
-              <p> {producto.item.nombre} X {producto.cantidad}</p>
-              <p> {producto.item.precio} </p>
-              <hr />
-            </div>
-          ))
-        }
+      <form onSubmit={manejadorFormulario} className="container formulario">
+
         <div>
-          <label>Nombre</label>
-          <input type="text" onChange={(e) => setNombre(e.target.value)} />
-        </div>
-        <div>
-          <label>Apellido</label>
-          <input type="text" onChange={(e) => setApellido(e.target.value)} />
-        </div>
-        <div>
-          <label>Telefono</label>
-          <input type="text" onChange={(e) => setTelefono(e.target.value)} />
-        </div>
-        <div>
-          <label>Email</label>
-          <input type="email" onChange={(e) => setEmail(e.target.value)} />
-        </div>
-        <div>
-          <label>Confirmacion de Email</label>
-          <input type="email" onChange={(e) => setEmailConfirmacion(e.target.value)} />
+          {
+            carrito.map(producto => (
+              <div key={producto.item.id}>
+                <p> {producto.item.nombre} X {producto.cantidad}</p>
+                <p> Total: ${producto.item.precio*producto.cantidad}.- </p>
+                <hr />
+              </div>
+            ))
+          }
+
+          {
+            cantidadTotal != 0 && <p> Total a pagar: ${cantidadTotal}.- </p>
+          }
+
         </div>
 
-        {
-          error && <p style={{ color: "red" }}> {error} </p>
-        }
+        <div>
+          <div className="input-group mb-3">
+            <span className="input-group-text" id="basic-addon1">Nombre</span>
+            <input type="text" className="form-control" onChange={(e) => setNombre(e.target.value)} value={nombre}/>
+          </div>
 
-        {
-          orderId ? <strong>Gracias por tu compra! Tu numero de orden es: {orderId} <Link className='btn btn-secondary' to="/"> Volver </Link></strong> : <button type="submit">Finalizar Compra</button>
-        }
+          <div className="input-group mb-3">
+            <span className="input-group-text" id="basic-addon1">Apellido</span>
+            <input type="text" className="form-control" onChange={(e) => setApellido(e.target.value)} value={apellido}/>
+          </div>
 
+          <div className="input-group mb-3">
+            <span className="input-group-text" id="basic-addon1">Telefono</span>
+            <input type="text" className="form-control" onChange={(e) => setTelefono(e.target.value)} value={telefono}/>
+          </div>
+
+          <div className="input-group mb-3">
+            <span className="input-group-text" id="basic-addon1">Email</span>
+            <input type="text" className="form-control" onChange={(e) => setEmail(e.target.value)} value={email}/>
+          </div>
+
+          <div className="input-group mb-3">
+            <span className="input-group-text" id="basic-addon1">Confirma tu Email</span>
+            <input type="text" className="form-control" onChange={(e) => setEmailConfirmacion(e.target.value)} value={emailConfirmacion}/>
+          </div>
+
+          <div className="input-group mb-3">
+            <span className="input-group-text">Comentarios</span>
+            <textarea className="form-control" onChange={(e) => setComentarios(e.target.value)} value={comentarios}></textarea>
+          </div>
+
+          {
+            error && <p className="error"> {error} </p>
+          }
+
+          {
+            orderId ? <div className="checkout"> <p>Gracias por tu compra! Tu numero de orden es:</p> <strong>{orderId}</strong> <Link className='btn btn-secondary' to="/"> Volver </Link></div> : <button type="submit" className='btn btn-success'>Finalizar Compra</button>
+          }
+        </div>
+        
       </form>
-    </div>
+    </>
   )
 }
 
