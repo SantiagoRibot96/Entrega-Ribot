@@ -1,23 +1,104 @@
 import { validateCode, arrayCompleted } from "./functions.js";
+import * as fs from "fs";
 
 export class ProductManager {
 
-    constructor() {
+    constructor(path) {
         this.products = [];
+        this.path = path;
+        this.currentId = 1;
+
+        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
     }
 
-    getProducts() {
+    async readProductsFromFile() {
+        try {
+            const cont = await fs.promises.readFile(this.path, "utf-8");
+
+            return JSON.parse(cont);
+        } catch (error) {
+            console.log(`No se pudieron traer los productos al programa ${error}`);
+
+            return false;
+        }
+    }
+
+    async saveProductsToFile(prod) {
+        try {
+            await fs.promises.writeFile(this.path, JSON.stringify(prod, null, 2));
+
+            return true;
+        } catch (error) {
+            console.log(`No se pudieron guardar los productos al archivo ${error}`);
+
+            return false;
+        }
+    }
+
+    async deleteProduct(id) {
+        if(await this.getProductById(id)) {
+            let prod = await this.getProducts();
+
+            let index = prod.findIndex((item) => item.id === id);
+
+            prod.splice(index, 1);
+
+            this.products = prod;
+
+            await this.saveProductsToFile(this.products);
+            
+            return true;
+        }else {
+            console.log("No se pudo borrar el producto");
+        }
+    }
+
+    async updateProduct(id, newProduct) {
+        let prod = await this.getProducts();
+        let copyProd = prod.slice();
+
+        let index = prod.findIndex((item) => item.id === id);
+
+        copyProd.splice(index, 1);
+
+        if(await this.getProductById(id)) {
+            if(arrayCompleted(newProduct.title, newProduct.description, newProduct.price, newProduct.thumbnail, newProduct.code, newProduct.stock)){
+                if(validateCode(copyProd, newProduct.code)){
+                    newProduct.id = id;
+                    prod[id-1] = {...newProduct};
+
+                    this.products = prod;
+
+                    await this.saveProductsToFile(this.products);
+
+                    return true;
+                }else {
+                    console.log(`El codigo ${newProduct.code} se repite, no se pudo actualizar el producto`);
+                }
+            }else {
+                console.log("Faltan datos. No se pudo actualizar el producto");
+                return false;
+            }
+        }else {
+            console.log("No se pudo actualizar el producto");
+            return false;
+        }
+    }
+
+    async getProducts() {
+        const prod = await this.readProductsFromFile();
+        this.products = prod;
         return this.products;
     }
 
-    addProduct(newTitle, newDescription, newPrice, newThumbnail, newCode, newStock) {
-        if(validateCode(this.products, newCode)) {
+    async addProduct(newTitle, newDescription, newPrice, newThumbnail, newCode, newStock) {
+        let prod = await this.getProducts();
+
+        if(validateCode(prod, newCode)) {
             if(arrayCompleted(newTitle, newDescription, newPrice, newThumbnail, newCode, newStock)) {
 
-                let newId = this.products.length + 1;
-
                 let newProduct = {
-                    id: newId,
+                    id: this.currentId++,
                     title: newTitle,
                     description: newDescription,
                     price: newPrice,
@@ -26,23 +107,27 @@ export class ProductManager {
                     stock: newStock
                 };
 
-                this.products.push(newProduct);
+                prod.push(newProduct);
+                this.products = prod;
+
+                await this.saveProductsToFile(this.products);
 
                 return true;
             }else {
-                console.log("Faltan datos del producto");
+                console.log("Faltan datos. No se pudo agregar el producto");
                 return false;
             }
         }else {
-            console.log(`El codigo ${newCode} ya fue utilizado`);
+            console.log(`El codigo ${newCode} ya fue utilizado. No se pudo agregar el producto`);
             return false;
         }
     }
 
-    getProductById(id) {
+    async getProductById(id) {
         let productSearched;
+        const prod = await this.readProductsFromFile();
 
-        this.products.forEach(item => {
+        prod.forEach(item => {
             if(item.id === id){
                 productSearched = item;
             }
@@ -51,7 +136,8 @@ export class ProductManager {
         if(productSearched){
             return productSearched;
         }else {
-            return "Producto no encontrado";
+            console.log("Producto no encontrado");
+            return false;
         }
     }
 }
