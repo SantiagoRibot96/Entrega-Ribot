@@ -7,8 +7,6 @@ export class ProductManager {
         this.products = [];
         this.path = path;
         this.currentId = 1;
-
-        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
     }
 
     async readProductsFromFile() {
@@ -17,9 +15,17 @@ export class ProductManager {
 
             return JSON.parse(cont);
         } catch (error) {
-            console.log(`No se pudieron traer los productos al programa ${error}`);
+            await fs.promises.writeFile(this.path, JSON.stringify(this.products, null, 2));
 
-            return false;
+            try {
+                const cont = await fs.promises.readFile(this.path, "utf-8");
+
+                return JSON.parse(cont);
+            } catch (error) {
+                console.log(`No se pudieron traer los productos al programa ${error}`);
+
+                return false;
+            }
         }
     }
 
