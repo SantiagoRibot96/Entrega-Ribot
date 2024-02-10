@@ -1,11 +1,7 @@
-/* 
-
-*/
-
 import { ProductManager } from "./class.js";
 import { PORT, app, createProducts} from "./init.js"
 
-let newProductList = new ProductManager("./productos.json");
+let newProductList = new ProductManager("./products.json");
 
 createProducts(newProductList);
 
