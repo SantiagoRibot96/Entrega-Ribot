@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "title": "Atun",
+    "description": "Atun enlatado en aceite",
+    "category": "Enlatados",
+    "price": 2000,
+    "thumbnail": "https://Atun",
+    "code": "ABC001",
+    "stock": 3
+  },
+  {
+    "id": 3,
+    "title": "Atun",
+    "description": "Atun enlatado en agua bajo en sodio",
+    "category": "Almacen",
+    "price": 2000,
+    "thumbnail": "https://Atun",
+    "code": "ABC003",
+    "stock": 8
+  }
+]
