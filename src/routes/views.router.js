@@ -1,5 +1,6 @@
 import express from "express";
 import { newProductList } from "../app.js";
+import { io } from "../init.js";
 
 const router = express.Router();
 
@@ -8,7 +9,13 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/realtimeproducts", async (req, res) => {
-    res.render("realTimeProducts", {products: await newProductList.getProducts(), title: "Productos con Websocket"});
+    io.on("connection", async () => {
+        console.log("New client");
+
+        io.emit("products", await newProductList.getProducts());
+    });
+
+    res.render("realTimeProducts", {title: "Productos con Websocket"});
 });
 
 export default router;

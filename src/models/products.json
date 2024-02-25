@@ -108,5 +108,15 @@
     "thumbnail": "https://Atun",
     "code": "ABC021",
     "stock": 3
+  },
+  {
+    "id": 12,
+    "title": "Atun",
+    "description": "Atun enlatado en aceite",
+    "category": "Enlatados",
+    "price": 2000,
+    "thumbnail": "https://Atun",
+    "code": "ABC022",
+    "stock": 3
   }
 ]

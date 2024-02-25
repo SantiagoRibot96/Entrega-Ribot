@@ -1,12 +1,7 @@
 const socket = io();
 
-socket.emit("handshake", "New connection");
-
 socket.on("products", (data) => {
     const list = document.getElementById("productList");
-    const deleteCards = document.getElementById("deleteCards");
-
-    deleteCards.innerHTML = "";
 
     let cards = "";
 
