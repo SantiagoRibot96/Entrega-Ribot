@@ -1,12 +1,24 @@
+//Modules
 import express from "express";
+import exphbs from "express-handlebars";
+import { Server } from "socket.io";
 import { newProductList } from "./app.js";
 
+//Server consts
 export const app = express();
 export const PORT = 8080;
 
+//Middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(express.static("./src/public"));
 
+//Handlebars
+app.engine("handlebars", exphbs.engine());
+app.set("view engine", "handlebars");
+app.set("views", "./src/views");
+
+//Init function
 export async function createProducts(newProductList){
     const products = await newProductList.getProducts();
 
@@ -23,3 +35,11 @@ export async function createProducts(newProductList){
         await newProductList.addProduct("Porotos", "Poroto negro en lata", "Enlatados", 2000, "https://Porotos", "ABC010", 3);
     }
 }
+
+//Listen server
+const httpServer = app.listen(PORT, () => {
+    console.log(`Abri el navegador en http://localhost:${PORT}`);
+});
+
+//Websocket
+export const io = new Server(httpServer);

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { newProductList } from "../app.js";
+import { io } from "../init.js";
 
 const router = Router();
 
@@ -33,6 +34,8 @@ router.post("/api/products", async (req, res) => {
     const cond = await newProductList.addProduct(title, description, category, price, thumbnail, code, stock);
 
     if(cond){
+        io.emit("products", await newProductList.getProducts());
+
         res.send({status:"succes", message: "Producto creado"});
     }else{
         res.send({status:"failed", message: "Producto no creado: ver logs"});
@@ -62,6 +65,6 @@ router.delete("/api/products/:pid", async (req, res) => {
     }else{
         res.send({status:"failed", message: "Producto no eliminado: ver logs"});
     }
-})
+});
 
 export default router
