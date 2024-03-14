@@ -3,6 +3,7 @@ import express from "express";
 import exphbs from "express-handlebars";
 import { Server } from "socket.io";
 import { newProductList } from "./app.js";
+import "./database.js";
 
 //Server consts
 export const app = express();

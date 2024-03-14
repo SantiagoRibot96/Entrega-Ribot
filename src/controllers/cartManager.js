@@ -1,90 +1,63 @@
-import { getCurrentID, readFromFile, saveToFile } from "../functions.js";
-import { newProductList } from "../app.js";
+import { CartModel } from "../models/cart.model.js";
 
 export class CartManager {
 
-    constructor(path) {
-        this.carts = [];
-        this.path = path;
-        this.currentId = 1;
-    }
-
     async getCarts() {
-        const carts = await readFromFile(this.path, []);
-        this.carts = carts;
-        return this.carts;
+        try {
+            const carts = await CartModel.find();
+            return carts;
+        } catch (error) {
+            console.log("No se pudieron traer los carritos ", error);
+            return false;
+        }
     }
 
     async addCart() {
-        this.carts = await this.getCarts();
-        this.currentId = getCurrentID(this.carts);
-        const newCart = {
-            id: this.currentId, 
-            products: []
-        };
-
-        this.carts.push(newCart);
-        saveToFile(this.path, this.carts);
+        try {
+            const newCart = new CartModel({products: []});
+            await newCart.save();
+            return newCart;
+        } catch (error) {
+            console.log("Error al crear el carrito ", error);
+            return false
+        }
     }
 
     async getCartById(id) {
-        let cartSearched;
-        const carts = await readFromFile(this.path, []);
-
-        carts.forEach(item => {
-            if(item.id === id){
-                cartSearched = item;
+        try {
+            const cart = await CartModel.findById(id);
+            
+            if(!cart){
+                console.log("Carrito no encontrado");
+                return false;
+            }else{
+                return cart;
             }
-        });
-
-        if(cartSearched){
-            return cartSearched.products;
-        }else {
-            console.log("Carrito no encontrado");
+        } catch (error) {
+            console.log("Error al buscar carrito ", error);
             return false;
         }
     }
 
-    async addProductToCart(id, newProductId) {
-        const cartSearched = await this.getCartById(id);
-        const carts = await this.getCarts();
-        const product = await newProductList.getProductById(newProductId);
-        const index = carts.findIndex((item) => item.id === id);
+    async addProductToCart(id, newProductId, quantity = 1) {
+        try {
+            const cart = await this.getCartById(id);
 
-        if(!product){
-            return false;
-        }
+            const existeProducto = cart.products.find(item => item.product.toString() === newProductId);
 
-        if(cartSearched){
-            const prodIndex = carts[index].products.findIndex((item) => item.id === newProductId);
-            
-            if(prodIndex != -1){
-                if(carts[index].products[prodIndex].quantity < product.stock){
-                    carts[index].products[prodIndex].quantity++;
-                }else{
-                    console.log("No hay suficiente stock");
-                    return false;
-                }
+            if(existeProducto){
+                existeProducto.quantity += quantity;
             }else{
-                const newProduct = {
-                    id: newProductId,
-                    quantity: 1
-                };
-
-                if(product.stock >= 1){
-                    carts[index].products.push(newProduct);
-                }else{
-                    console.log("No hay suficiente stock");
-                    return false;
-                }
+                cart.products.push({ product: newProductId, quantity});
             }
-            
-            this.carts = carts;
-            saveToFile(this.path, this.carts);
-            return true;
-        }else{
-            console.log("No se encontro carrito con ese ID");
-            return false;
+
+            cart.markModified("products");
+
+            await cart.save();
+            return cart;
+        } catch (error) {
+            console.log("No se pudo encontrar el carrito ", error);
+            return false
         }
     }
 }

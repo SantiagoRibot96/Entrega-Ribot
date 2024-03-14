@@ -1,23 +1,38 @@
 const socket = io();
 
-socket.on("products", (data) => {
-    const list = document.getElementById("productList");
+let user;
 
-    let cards = "";
+const chatBox = document.getElementById("chatBox");
+
+Swal.fire({
+    title: "Identifiquese",
+    input: "text",
+    text: "Ingrese su nombre para identificarse",
+    inputValidator: (value) => {
+        return !value && "Necesitas escribir un nombre para continuar"
+    },
+    allowOutsideClick: false
+}).then(result => {
+    user = result.value;
+    socket.emit("message", {user: user, message: "Bienvenido"})
+});
+
+chatBox.addEventListener("keyup", (event) => {
+    if(event.key === "Enter"){
+        if(chatBox.value.trim().length > 0){
+            socket.emit("message", {user: user, message: chatBox.value});
+            chatBox.value = "";
+        }
+    }
+})
+
+socket.on("messagesLogs", (data) => {
+    let log = document.getElementById("messagesLogs");
+    let mensajes = "";
 
     data.forEach(item => {
-        cards += `
-            <div class="card" style="width: 18rem;">
-                <img src=${item.thumbnail} class="card-img-top" alt="${item.title}">
-                <div class="card-body">
-                    <h5 class="card-title">${item.title}</h5>
-                    <p class="card-text">${item.description}</p>
-                    <p class="card-text">${item.price}</p>
-                    <a href="#" class="btn btn-primary">Comprar</a>
-                </div>
-            </div>
-        `;
+        mensajes = mensajes + `${item.user} dice: ${item.message} <br>`;
     });
 
-    list.innerHTML = cards;
+    log.innerHTML = mensajes;
 });

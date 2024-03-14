@@ -4,13 +4,13 @@ import { newCartList } from "../app.js";
 const router = Router();
 
 router.post("/api/carts", async (req, res) => {
-    await newCartList.addCart();
+    const newCart = await newCartList.addCart();
 
-    res.send({status: "Success", message: `Cart con id ${newCartList.currentId} creado`});
+    res.send({status: "Success", message: `Cart con id ${newCart._id} creado`});
 });
 
 router.get("/api/carts/:cid", async (req, res) => {
-    const cid = parseInt(req.params.cid);
+    const cid = req.params.cid;
 
     const products = await newCartList.getCartById(cid);
 
@@ -22,10 +22,11 @@ router.get("/api/carts/:cid", async (req, res) => {
 });
 
 router.post("/api/carts/:cid/product/:pid", async (req, res) => {
-    const cid = parseInt(req.params.cid);
-    const pid = parseInt(req.params.pid);
+    const cid = req.params.cid;
+    const pid = req.params.pid;
+    const quantity = req.body.quantity || 1;
 
-    const cond = await newCartList.addProductToCart(cid, pid);
+    const cond = await newCartList.addProductToCart(cid, pid, quantity);
 
     if(cond){
         res.send({status: "Success", message: `Producto con id ${pid} agregado al carrito ${cid}`});

@@ -46,3 +46,4 @@
 - Express-handlebars
 - Socket.io
 - File storage
+- Mongoose

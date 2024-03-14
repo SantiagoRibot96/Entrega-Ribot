@@ -1,120 +1,85 @@
-import { validateCode, arrayCompleted, getCurrentID, readFromFile, saveToFile } from "../functions.js";
+import { ProductModel } from "../models/product.model.js";
 
 export class ProductManager {
 
-    constructor(path) {
-        this.products = [];
-        this.path = path;
-        this.currentId = 1;
-    }
-
     async deleteProduct(id) {
-        if(await this.getProductById(id)) {
-            let prod = await this.getProducts();
+        try {
+            const productDelete = await ProductModel.findByIdAndDelete(id);
 
-            let index = prod.findIndex((item) => item.id === id);
-
-            prod.splice(index, 1);
-
-            this.products = prod;
-
-            await saveToFile(this.path, this.products);
-            
-            return true;
-        }else {
-            console.log("No se pudo borrar el producto");
-            
+            if(!productDelete){
+                console.log("Producto no encontrado");
+                return false;
+            }else{
+                console.log("Producto eliminado");
+                return true;
+            }
+        } catch (error) {
+            console.log("Error al buscar y eliminar el producto ", error);
             return false;
         }
     }
 
     async updateProduct(id, newProduct) {
-        let prod = await this.getProducts();
-        let copyProd = prod.slice();
+        try {
+            const productUpdate = await ProductModel.findByIdAndUpdate(id, newProduct);
 
-        const index = prod.findIndex((item) => item.id === id);
-
-        copyProd.splice(index, 1);
-
-        if(await this.getProductById(id)) {
-            if(arrayCompleted(newProduct.title, newProduct.description, newProduct.category, newProduct.price, newProduct.thumbnail, newProduct.code, newProduct.stock)){
-                if(validateCode(copyProd, newProduct.code)){
-                    newProduct.id = id;
-                    prod[id-1] = {...newProduct};
-
-                    this.products = prod;
-
-                    await saveToFile(this.path, this.products);
-
-                    return true;
-                }else {
-                    console.log(`El codigo ${newProduct.code} se repite, no se pudo actualizar el producto`);
-                }
-            }else {
-                console.log("Faltan datos. No se pudo actualizar el producto");
+            if(!productUpdate){
+                console.log("Producto no encontrado");
                 return false;
+            }else{
+                console.log("Producto actualizado");
+                return productUpdate;
             }
-        }else {
-            console.log("No se pudo actualizar el producto");
+        } catch (error) {
+            console.log("Error al buscar y actualizar el producto ", error);
             return false;
         }
     }
 
     async getProducts() {
-        const prod = await readFromFile(this.path, []);
-        this.products = prod;
-        return this.products;
+        try {
+            const productos = await ProductModel.find();
+            return productos;
+        } catch (error) {
+            console.log("No se pudieron traer los productos ", error);
+            return false;
+        }
     }
 
-    async addProduct(newTitle, newDescription, newCategory, newPrice, newThumbnail, newCode, newStock) {
-        let prod = await this.getProducts();
-        this.currentId = getCurrentID(prod);
+    async addProduct(title, description, category, price, thumbnail, code, stock) {
+        try {
+            let newProduct = new ProductModel ({
+                title,
+                description,
+                category,
+                price,
+                thumbnail,
+                code,
+                stock,
+                status: true
+            });
 
-        if(validateCode(prod, newCode)) {
-            if(arrayCompleted(newTitle, newDescription, newCategory, newPrice, newThumbnail, newCode, newStock)) {
-
-                let newProduct = {
-                    id: this.currentId,
-                    title: newTitle,
-                    description: newDescription,
-                    category: newCategory,
-                    price: newPrice,
-                    thumbnail: newThumbnail,
-                    code: newCode,
-                    stock: newStock
-                };
-
-                prod.push(newProduct);
-                this.products = prod;
-
-                await saveToFile(this.path, this.products);
-
-                return true;
-            }else {
-                console.log("Faltan datos. No se pudo agregar el producto");
-                return false;
-            }
-        }else {
-            console.log(`El codigo ${newCode} ya fue utilizado. No se pudo agregar el producto`);
+            await newProduct.save();
+            
+            return true;
+        } catch (error) {
+            console.log("Error al agregar producto " + error);
             return false;
         }
     }
 
     async getProductById(id) {
-        let productSearched;
-        const prod = await readFromFile(this.path, []);
+        try {
+            const producto = await ProductModel.findById(id);
 
-        prod.forEach(item => {
-            if(item.id === id){
-                productSearched = item;
+            if(producto){
+                return producto;
+            }else{
+                console.log("Producto no encontrado");
+                return false;
             }
-        });
-
-        if(productSearched){
-            return productSearched;
-        }else {
-            console.log("Producto no encontrado");
-            return false;
+        } catch (error) {
+            console.log("Error al buscar producto ", error);
         }
     }
 }

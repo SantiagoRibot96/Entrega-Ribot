@@ -17,7 +17,7 @@ router.get("/api/products", async (req, res) => {
 });
 
 router.get("/api/products/:pid", async (req, res) => {
-    const pid = parseInt(req.params.pid);
+    const pid = req.params.pid;
     
     const product = await newProductList.getProductById(pid);
 
@@ -29,7 +29,7 @@ router.get("/api/products/:pid", async (req, res) => {
 });
 
 router.post("/api/products", async (req, res) => {
-    const {id,title, description, category, price, thumbnail, code, stock} = req.body;
+    const {id,title, description, category, price, thumbnail, code, stock, status} = req.body;
 
     const cond = await newProductList.addProduct(title, description, category, price, thumbnail, code, stock);
 
@@ -43,7 +43,7 @@ router.post("/api/products", async (req, res) => {
 });
 
 router.put("/api/products/:pid", async (req, res) => {
-    const pid = parseInt(req.params.pid);
+    const pid = req.params.pid;
     const prod = req.body;
 
     const cond = await newProductList.updateProduct(pid, {...prod});
@@ -56,7 +56,7 @@ router.put("/api/products/:pid", async (req, res) => {
 });
 
 router.delete("/api/products/:pid", async (req, res) => {
-    const pid = parseInt(req.params.pid);
+    const pid = req.params.pid;
     
     const cond = await newProductList.deleteProduct(pid);
 
