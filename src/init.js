@@ -15,7 +15,12 @@ app.use(express.urlencoded({extended:true}));
 app.use(express.static("./src/public"));
 
 //Handlebars
-app.engine("handlebars", exphbs.engine());
+app.engine("handlebars", exphbs.engine({
+    runtimeOptions:{
+        allowProtoMethodsByDefault:true,
+        allowProtoPropertiesByDefault:true,
+    }})
+);
 app.set("view engine", "handlebars");
 app.set("views", "./src/views");
 
