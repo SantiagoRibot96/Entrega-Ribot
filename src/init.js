@@ -12,7 +12,8 @@ export const PORT = 8080;
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-app.use(express.static("./src/public"));
+app.use("*/css", express.static("./src/public/css"));
+app.use("*/js", express.static("./src/public/js"));
 
 //Handlebars
 app.engine("handlebars", exphbs.engine({
