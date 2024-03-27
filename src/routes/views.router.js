@@ -1,5 +1,5 @@
 import express from "express";
-import { newProductList } from "../app.js";
+import { newCartList, newProductList } from "../app.js";
 
 const router = express.Router();
 
@@ -50,5 +50,34 @@ router.get("/products", async (req, res) => {
 router.get("/chat", (req, res) => {
     res.render("chat");
 });
+
+router.get("/carts/:cid", async (req, res) => {
+    const cid = req.params.cid;
+
+    try {
+        const cart = await newCartList.getCartById(cid);
+
+        if(!cart){
+            console.log("No existe carrito con ese id");
+            return res.status(404).json({
+                status: "Failed",
+                error: "No se encontro el carrito",
+            });
+        }
+
+        const products = cart.products.map(item => ({
+            product: item.product.toObject(),
+            quantity: item.quantity
+        }));
+
+        res.render("carts", {productos: products});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: "Failed",
+            error: "Error interno del servidor", 
+        });
+    }
+})
 
 export default router;
