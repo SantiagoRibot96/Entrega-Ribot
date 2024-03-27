@@ -35,4 +35,18 @@ router.post("/api/carts/:cid/product/:pid", async (req, res) => {
     }
 });
 
+router.delete("/api/carts/:cid/product/:pid", async (req, res) => {
+    const cid = req.params.cid;
+    const pid = req.params.pid;
+
+    const cond = await newCartList.deleteProduct(cid, pid);
+
+    if(cond){
+        res.send({status: "Success", message: `Producto con id ${pid} fue eliminado del carrito ${cid}`});
+    }else{
+        res.send({status: "Failed", message: `No se pudo eliminar el producto ${pid} del carrito ${cid}`});
+    }
+});
+
+
 export default router

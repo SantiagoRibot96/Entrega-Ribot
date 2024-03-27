@@ -60,4 +60,27 @@ export class CartManager {
             return false
         }
     }
+
+    async deleteProduct(cid, pid) {
+        try {
+            const cart = await this.getCartById(cid);
+
+            const existeProducto = cart.products.findIndex(item => item.product.toString() === pid);
+
+            if(existeProducto != -1){
+                cart.products.splice(existeProducto, 1);
+                
+                cart.markModified("products");
+
+                await cart.save();
+                return true;
+            }else{
+                console.log("No se encontro el producto en el carrito");
+                return false;
+            }
+        } catch (error) {
+            console.log("No se pudo eliminar el producto del carrito", error);
+            return false;
+        }
+    }
 }
