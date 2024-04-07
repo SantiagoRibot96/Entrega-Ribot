@@ -47,3 +47,5 @@
 - Socket.io
 - File storage
 - Mongoose
+- Sessions
+- Login Simple

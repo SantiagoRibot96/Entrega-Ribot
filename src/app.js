@@ -8,6 +8,7 @@ import { MessageModel } from "./models/message.model.js";
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import viewsRouter  from "./routes/views.router.js";
+import sessionsRouter from "./routes/sessions.router.js";
 
 //Instancias
 let newProductList = new ProductManager();
@@ -17,6 +18,7 @@ let newCartList = new CartManager();
 app.use("/", productsRouter);
 app.use("/", cartsRouter);
 app.use("/", viewsRouter);
+app.use("/api/sessions", sessionsRouter);
 
 io.on("connection", (socket) => {
     socket.on("message", async (data) => {

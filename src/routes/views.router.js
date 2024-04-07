@@ -4,10 +4,14 @@ import { newCartList, newProductList } from "../app.js";
 const router = express.Router();
 
 router.get("/", (req, res) => {
-    res.redirect("/products");
+    res.redirect("/login");
 });
 
 router.get("/products", async (req, res) => {
+    if(!req.session.login){
+        return res.redirect("/login");
+    }
+
     try {
         const { limit = 8, page = 1, sort, query } = req.query;
         let firstPage = false;
@@ -35,7 +39,8 @@ router.get("/products", async (req, res) => {
             nextLink: products.hasNextPage ? products.nextPage : null,
             prevLink: products.hasPrevPage ? products.prevPage : null,
             firstPage,
-            limit
+            limit,
+            userName: req.session.user.first_name
         });
 
     } catch (error) {
@@ -48,10 +53,18 @@ router.get("/products", async (req, res) => {
 });
 
 router.get("/chat", (req, res) => {
-    res.render("chat");
+    if(!req.session.login){
+        return res.redirect("/login");
+    }
+
+    res.render("chat", {userName: req.session.user.first_name});
 });
 
 router.get("/carts/:cid", async (req, res) => {
+    if(!req.session.login){
+        return res.redirect("/login");
+    }
+
     const cid = req.params.cid;
 
     try {
@@ -59,18 +72,15 @@ router.get("/carts/:cid", async (req, res) => {
 
         if(!cart){
             console.log("No existe carrito con ese id");
-            return res.status(404).json({
-                status: "Failed",
-                error: "No se encontro el carrito",
-            });
+            return res.status(404).send("Carrito no encontrado");
         }
 
         const products = cart.products.map(item => ({
             product: item.product.toObject(),
             quantity: item.quantity
         }));
-
-        res.render("carts", {productos: products});
+        
+        res.render("carts", {productos: products, userName: req.session.user.first_name});
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -78,6 +88,29 @@ router.get("/carts/:cid", async (req, res) => {
             error: "Error interno del servidor", 
         });
     }
-})
+});
+
+router.get("/register", (req, res) => {
+    if(req.session.login){
+        return res.redirect("/products");
+    }
+    
+    res.render("registro");
+});
+
+router.get("/login", (req, res) => {
+    if(req.session.login){
+        return res.redirect("/products");
+    }
+    res.render("login");
+});
+
+router.get("/profile", (req, res) => {
+    if(!req.session.login){
+        return res.redirect("/login");
+    }
+
+    res.render("profile", {user: req.session.user, userName: req.session.user.first_name});
+});
 
 export default router;

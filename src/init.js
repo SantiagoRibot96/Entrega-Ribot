@@ -1,7 +1,10 @@
 //Modules
 import express from "express";
 import exphbs from "express-handlebars";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import { Server } from "socket.io";
+
 import { newProductList } from "./app.js";
 import "./database.js";
 
@@ -12,8 +15,19 @@ export const PORT = 8080;
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+
 app.use("*/css", express.static("./src/public/css"));
 app.use("*/js", express.static("./src/public/js"));
+
+app.use(session({
+    secret: "secretCoder",
+    resave: true,
+    saveUninitialized: true,
+    store: MongoStore.create({
+        mongoUrl: "mongodb+srv://santiribot79:coderhouse@cluster0.dxp69gq.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0",
+        ttl: 100000
+    })
+}));
 
 //Handlebars
 app.engine("handlebars", exphbs.engine({
