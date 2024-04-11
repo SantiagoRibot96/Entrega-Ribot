@@ -48,4 +48,5 @@
 - File storage
 - Mongoose
 - Sessions
-- Login Simple
+- Login con passport
+- Login con passport-github2

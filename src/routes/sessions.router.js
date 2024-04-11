@@ -1,64 +1,66 @@
 import express from "express";
-
-import UserModel from "../models/user.model.js";
+import passport from "passport";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
-    const {first_name, last_name, email, password, age} = req.body;
+router.post("/", passport.authenticate("register", {
+    failureRedirect: "/api/sessions/failedregister"
+}), async (req, res) => {
+    if(!req.user) return res.status(400).send("Credenciales invalidas");
 
-    try {
-        const existeUsuario = await UserModel.findOne({email: email});
-
-        if(existeUsuario){
-            return res.status(400).send("El correo electronico ya esta registrado")
-        }else{
-            let rol = "Usuario";
-
-            if(email === "adminCoder@coder.com") rol = "Administrador";
-
-            const nuevoUsuario = await UserModel.create({first_name, last_name, email, password, age, rol});
-
-            req.session.login = true;
-            req.session.user = {...nuevoUsuario._doc};
-            res.redirect("/profile");
-        }
-    } catch (error) {
-        res.status(500).send("Error interno del servidor");
+    req.session.user = {
+        first_name: req.user.first_name,
+        last_name: req.user.last_name,
+        age: req.user.age,
+        email: req.user.email,
+        rol: req.user.rol
     }
+
+    req.session.login = true;
+
+    res.redirect("/products");
 });
 
-router.post("/login", async (req, res) => {
-    const {email, password} = req.body;
+router.get("/failedregister", (req, res) => {
+    res.send("Registro fallido");
+});
 
-    try {
-        const usuario = await UserModel.findOne({email: email});
-        if(usuario){
-            if(usuario.password === password){
-                req.session.login = true;
-                req.session.user = {
-                    first_name: usuario.first_name,
-                    last_name: usuario.last_name,
-                    email: usuario.email,
-                    password: usuario.password,
-                    age: usuario.age,
-                    rol: usuario.rol 
-                };
-                res.redirect("/products");
-            }else{
-                res.status(401).send("Contraseña no valida");
-            }
-        }else{
-            res.status(404).send("Usuario no encontrado")
-        }
+router.post("/login", passport.authenticate("login", {
+    failureRedirect: "/api/sessions/faillogin"
+}), async (req, res) => {
+    if(!req.user) return res.status(400).send("Credenciales invalidas");
 
-    } catch (error) {
-        res.status(500).send("Error interno del servidor");
+    req.session.user = {
+        first_name: req.user.first_name,
+        last_name: req.user.last_name,
+        age: req.user.age,
+        email: req.user.email,
+        rol: req.user.rol
     }
+
+    req.session.login = true;
+
+    res.redirect("/products");
+});
+
+router.get("/faillogin", (req, res) => {
+    res.send("Fallo al iniciar sesion");
+});
+
+router.get("/github", passport.authenticate("github", {
+    scope: ["user: email"]
+}), async (req, res) => {});
+
+router.get("/githubcallback", passport.authenticate("github", {
+    failureRedirect: "/login"
+}), async (req, res) => {
+    req.session.user = req.user;
+    req.session.login = true;
+    res.redirect("/products");
 });
 
 router.get("/logout", (req, res) => {
-    if(req.session.login){
+    if(req.session.login) {
         req.session.destroy();
     }
     res.redirect("/login");

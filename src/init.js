@@ -4,9 +4,11 @@ import exphbs from "express-handlebars";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import { Server } from "socket.io";
+import passport from "passport";
 
 import { newProductList } from "./app.js";
 import "./database.js";
+import initializePassport from "./config/passport.config.js";
 
 //Server consts
 export const app = express();
@@ -29,7 +31,6 @@ app.use(session({
     })
 }));
 
-//Handlebars
 app.engine("handlebars", exphbs.engine({
     runtimeOptions:{
         allowProtoMethodsByDefault:true,
@@ -38,6 +39,10 @@ app.engine("handlebars", exphbs.engine({
 );
 app.set("view engine", "handlebars");
 app.set("views", "./src/views");
+
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Init function
 export async function createProducts(newProductList){
