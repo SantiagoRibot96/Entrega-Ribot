@@ -4,7 +4,7 @@ import { io } from "../init.js";
 
 const router = Router();
 
-router.get("/api/products", async (req, res) => {
+router.get("/", async (req, res) => {
     const limit = parseInt(req.query.limit);
 
     const myProducts = await newProductList.getProducts();
@@ -16,7 +16,7 @@ router.get("/api/products", async (req, res) => {
     }
 });
 
-router.get("/api/products/:pid", async (req, res) => {
+router.get("/:pid", async (req, res) => {
     const pid = req.params.pid;
     
     const product = await newProductList.getProductById(pid);
@@ -28,7 +28,7 @@ router.get("/api/products/:pid", async (req, res) => {
     }
 });
 
-router.post("/api/products", async (req, res) => {
+router.post("/", async (req, res) => {
     const {id,title, description, category, price, thumbnail, code, stock, status} = req.body;
 
     const cond = await newProductList.addProduct(title, description, category, price, thumbnail, code, stock);
@@ -42,7 +42,7 @@ router.post("/api/products", async (req, res) => {
     }
 });
 
-router.put("/api/products/:pid", async (req, res) => {
+router.put("/:pid", async (req, res) => {
     const pid = req.params.pid;
     const prod = req.body;
 
@@ -55,7 +55,7 @@ router.put("/api/products/:pid", async (req, res) => {
     }
 });
 
-router.delete("/api/products/:pid", async (req, res) => {
+router.delete("/:pid", async (req, res) => {
     const pid = req.params.pid;
     
     const cond = await newProductList.deleteProduct(pid);

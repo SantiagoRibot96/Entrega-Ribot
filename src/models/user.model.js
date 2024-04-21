@@ -21,10 +21,15 @@ const userSchema = new mongoose.Schema({
     age: {
         type: Number,
         required: true
-    }, 
-    rol: {
+    },
+    cart: {
         type: String,
         required: true
+    },
+    rol: {
+        type: String,
+        enum: ["admin", "user"],
+        default: "user"
     }
 });
 

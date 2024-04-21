@@ -1,17 +1,16 @@
 import express from "express";
+import jwt from "jsonwebtoken";
+import passport from "passport";
+
 import { newCartList, newProductList } from "../app.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    res.redirect("/login");
+router.get("/", passport.authenticate("current", {session: false, failureRedirect: "/tokenLogin"}), (req, res) => {
+    res.redirect("/products");
 });
 
-router.get("/products", async (req, res) => {
-    if(!req.session.login){
-        return res.redirect("/login");
-    }
-
+router.get("/products", passport.authenticate("current", {session: false, failureRedirect: "/tokenLogin"}), async (req, res) => {
     try {
         const { limit = 8, page = 1, sort, query } = req.query;
         let firstPage = false;
@@ -40,31 +39,19 @@ router.get("/products", async (req, res) => {
             prevLink: products.hasPrevPage ? products.prevPage : null,
             firstPage,
             limit,
-            userName: req.session.user.first_name
+            userName: req.user.first_name
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: "error",
-            error: "Error interno del servidor"
-        });
+        res.status(500).send(`Error interno del servidor ${error}`);
     }
 });
 
-router.get("/chat", (req, res) => {
-    if(!req.session.login){
-        return res.redirect("/login");
-    }
-
-    res.render("chat", {userName: req.session.user.first_name});
+router.get("/chat", passport.authenticate("current", {session: false, failureRedirect: "/tokenLogin"}), (req, res) => {
+    res.render("chat", {userName: req.user.first_name});
 });
 
-router.get("/carts/:cid", async (req, res) => {
-    if(!req.session.login){
-        return res.redirect("/login");
-    }
-
+router.get("/carts/:cid", passport.authenticate("current", {session: false, failureRedirect: "/tokenLogin"}), async (req, res) => {
     const cid = req.params.cid;
 
     try {
@@ -80,37 +67,30 @@ router.get("/carts/:cid", async (req, res) => {
             quantity: item.quantity
         }));
         
-        res.render("carts", {productos: products, userName: req.session.user.first_name});
+        res.render("carts", {productos: products, userName: req.user.first_name});
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: "Failed",
-            error: "Error interno del servidor", 
-        });
+        res.status(500).send(`Error interno del servidor ${error}`);
     }
 });
 
+router.get("/tokenRegister", passport.authenticate("current", {session: false, failureRedirect: "/register"}), (req, res) => {
+    res.redirect("/products");
+});
+
+router.get("/tokenLogin", passport.authenticate("current", {session: false, failureRedirect: "/login"}), (req, res) => {
+    res.redirect("/products");
+});
+
 router.get("/register", (req, res) => {
-    if(req.session.login){
-        return res.redirect("/products");
-    }
-    
     res.render("registro");
 });
 
 router.get("/login", (req, res) => {
-    if(req.session.login){
-        return res.redirect("/products");
-    }
     res.render("login");
 });
 
-router.get("/profile", (req, res) => {
-    if(!req.session.login){
-        return res.redirect("/login");
-    }
-
-    res.render("profile", {user: req.session.user, userName: req.session.user.first_name});
+router.get("/profile", passport.authenticate("current", {session: false}), (req, res) => {
+    res.render("profile", {user: req.user, userName: req.user.first_name});
 });
 
 export default router;

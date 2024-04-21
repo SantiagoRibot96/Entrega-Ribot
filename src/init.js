@@ -5,6 +5,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import { Server } from "socket.io";
 import passport from "passport";
+import cookieParser from "cookie-parser";
 
 import { newProductList } from "./app.js";
 import "./database.js";
@@ -40,9 +41,9 @@ app.engine("handlebars", exphbs.engine({
 app.set("view engine", "handlebars");
 app.set("views", "./src/views");
 
-initializePassport();
+app.use(cookieParser());
 app.use(passport.initialize());
-app.use(passport.session());
+initializePassport();
 
 //Init function
 export async function createProducts(newProductList){

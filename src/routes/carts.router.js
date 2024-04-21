@@ -4,13 +4,13 @@ import { CartManager } from "../controllers/cartManager.js";
 
 const router = Router();
 
-router.post("/api/carts", async (req, res) => {
+router.post("/", async (req, res) => {
     const newCart = await newCartList.addCart();
 
     res.send({status: "Success", message: `Cart con id ${newCart._id} creado`});
 });
 
-router.get("/api/carts/:cid", async (req, res) => {
+router.get("/:cid", async (req, res) => {
     const cid = req.params.cid;
 
     const products = await newCartList.getCartById(cid);
@@ -22,7 +22,7 @@ router.get("/api/carts/:cid", async (req, res) => {
     }
 });
 
-router.post("/api/carts/:cid/product/:pid", async (req, res) => {
+router.post("/:cid/product/:pid", async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
     const quantity = req.body.quantity || 1;
@@ -36,7 +36,7 @@ router.post("/api/carts/:cid/product/:pid", async (req, res) => {
     }
 });
 
-router.delete("/api/carts/:cid/product/:pid", async (req, res) => {
+router.delete("/:cid/product/:pid", async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
 
@@ -49,7 +49,7 @@ router.delete("/api/carts/:cid/product/:pid", async (req, res) => {
     }
 });
 
-router.put("/api/carts/:cid", async (req, res) => {
+router.put("/:cid", async (req, res) => {
     const cid = req.params.cid;
     const updatedProducts = req.body;
 
@@ -68,7 +68,7 @@ router.put("/api/carts/:cid", async (req, res) => {
     }
 });
 
-router.put("/api/carts/:cid/product/:pid", async (req, res) => {
+router.put("/:cid/product/:pid", async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
     const newQuantity = req.body.quantity;
@@ -88,7 +88,7 @@ router.put("/api/carts/:cid/product/:pid", async (req, res) => {
     }
 });
 
-router.delete("/api/carts/:cid", async (req, res) => {
+router.delete("/:cid", async (req, res) => {
     const cid = req.params.cid;
 
     try {

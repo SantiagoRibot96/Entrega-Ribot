@@ -1,50 +1,68 @@
 import express from "express";
 import passport from "passport";
+import jwt from "jsonwebtoken";
+
+import UserModel from "../models/user.model.js";
+import { createHash, isValidPassword } from "../utils/hashbcrypt.js";
+import { newCartList } from "../app.js";
 
 const router = express.Router();
 
-router.post("/", passport.authenticate("register", {
-    failureRedirect: "/api/sessions/failedregister"
-}), async (req, res) => {
-    if(!req.user) return res.status(400).send("Credenciales invalidas");
+router.post("/", async (req, res) => {
+    const {first_name, last_name, email, password, age} = req.body;
 
-    req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        age: req.user.age,
-        email: req.user.email,
-        rol: req.user.rol
+    try {
+        let user = await UserModel.findOne({email});
+
+        if(user) return res.status(400).send("El usuario ya existe");
+
+        const cartId = await newCartList.addCart();
+
+        let newUser = {
+            first_name,
+            last_name,
+            email,
+            age,
+            password: createHash(password),
+            cart: cartId._id
+        }
+
+        await UserModel.create(newUser);
+        
+        const token = jwt.sign({email}, "coderhouse", {expiresIn: "1h"});
+
+        res.cookie("coderCookieToken", token, {
+            maxAge: 3600000,
+            httpOnly: true
+        });
+
+        res.redirect("/products");
+    } catch (error) {
+        res.status(500).send(`Error interno del servidor ${error}`);
     }
-
-    req.session.login = true;
-
-    res.redirect("/products");
 });
 
-router.get("/failedregister", (req, res) => {
-    res.send("Registro fallido");
-});
+router.post("/login", async (req, res) => {
+    const {email, password} = req.body;
 
-router.post("/login", passport.authenticate("login", {
-    failureRedirect: "/api/sessions/faillogin"
-}), async (req, res) => {
-    if(!req.user) return res.status(400).send("Credenciales invalidas");
+    try {
+        const user = await UserModel.findOne({email});
 
-    req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        age: req.user.age,
-        email: req.user.email,
-        rol: req.user.rol
+        if(!user) return res.status(401).send("El usuario no existe");
+
+        if(!isValidPassword(password, user)) return res.status(401).send("Usuario y contraseña no coinciden");
+
+        const token = jwt.sign({email}, "coderhouse", {expiresIn: "1h"});
+
+        res.cookie("coderCookieToken", token, {
+            maxAge: 3600000,
+            httpOnly: true
+        });
+    
+        res.redirect("/products");
+    } catch (error) {
+        res.status(500).send(`Error interno del servidor ${error}`);
     }
-
-    req.session.login = true;
-
-    res.redirect("/products");
-});
-
-router.get("/faillogin", (req, res) => {
-    res.send("Fallo al iniciar sesion");
 });
 
 router.get("/github", passport.authenticate("github", {
@@ -54,16 +72,22 @@ router.get("/github", passport.authenticate("github", {
 router.get("/githubcallback", passport.authenticate("github", {
     failureRedirect: "/login"
 }), async (req, res) => {
-    req.session.user = req.user;
-    req.session.login = true;
+    const token = jwt.sign({email: req.user.email}, "coderhouse", {expiresIn: "1h"});
+
+    res.cookie("coderCookieToken", token, {
+        maxAge: 3600000,
+        httpOnly: true
+    });
+
     res.redirect("/products");
 });
 
-router.get("/logout", (req, res) => {
-    if(req.session.login) {
-        req.session.destroy();
-    }
-    res.redirect("/login");
+router.get("/current", passport.authenticate("current", {session: false, failureRedirect: "/login"}), (req, res) => {
+    res.send(req.user);
 });
 
+router.get("/logout", (req, res) => {
+    res.clearCookie("coderCookieToken");
+    res.redirect("/login");
+});
 export default router;

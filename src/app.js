@@ -15,8 +15,8 @@ let newProductList = new ProductManager();
 let newCartList = new CartManager();
 
 //Routes
-app.use("/", productsRouter);
-app.use("/", cartsRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
 app.use("/api/sessions", sessionsRouter);
 
