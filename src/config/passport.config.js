@@ -3,37 +3,37 @@ import GitHubStrategy from "passport-github2";
 import jwt from "passport-jwt";
 
 import UserModel from "../models/user.model.js";
-import { newCartList } from "../app.js";
+import UserService from "../services/users.services.js";
+import configObject from "./config.js";
 
 const JWTStrategy = jwt.Strategy;
 const ExtractJwt = jwt.ExtractJwt;
 
+const userService = new UserService();
+const { gh_client_id, gh_client_secret, gh_callback_url, token_pass, cookie } = configObject;
+
 const initializePassport = () => {
     passport.use("github", new GitHubStrategy({
-        clientID: "Iv1.00b7af9852391fd4",
-        clientSecret: "038d689a497d8329562f2ad044c50ee03527718a",
-        callbackURL: "http://localhost:8080/api/sessions/githubcallback"
+        clientID: gh_client_id,
+        clientSecret: gh_client_secret,
+        callbackURL: gh_callback_url
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            const user = await UserModel.findOne({email: profile._json.email});
-            const cartId = await newCartList.addCart();
-
-            if(!user) {
-                let newUser = {
-                    first_name: profile._json.name,
-                    last_name: "unknown",
-                    age: 36,
-                    email: profile._json.email,
-                    password: "imposibleDeHackear",
-                    cart: cartId._id
-                }
-                
-                let result = await UserModel.create(newUser);
-                
-                done(null, result);
-            }else{
-                done(null, user);
+            const user = {
+                first_name: profile._json.name,
+                last_name: " ",
+                email: profile._json.email,
+                password: "imposibleDeHackear",
+                age: 36
             }
+
+            let token;
+
+            await userService.findUser(user.email) ? 
+                token = await userService.validateUser(user.email, user.password):
+                token = await userService.registerUser(user.first_name, user.last_name, user.email, user.password, user.age);
+
+            done(null, token);
         } catch (error) {
             done(error);
         }
@@ -41,11 +41,11 @@ const initializePassport = () => {
 
     passport.use("current", new JWTStrategy({
         jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-        secretOrKey: "coderhouse",
+        secretOrKey: token_pass,
 
     }, async (jwt_payload, done) => {
         try {
-            const user = await UserModel.findOne({email: jwt_payload.email});
+            const user = await userService.findUser(jwt_payload.email);
 
             return done(null, user);
         } catch (error) {
@@ -67,7 +67,7 @@ const cookieExtractor = (req) => {
     let token = null;
 
     if(req && req.cookies) {
-        token = req.cookies["coderCookieToken"];
+        token = req.cookies[cookie];
     }
     
     return token;

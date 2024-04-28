@@ -1,18 +1,14 @@
 //Modules
-import { app, io} from "./init.js"
-import { ProductManager } from "./controllers/productManager.js";
-import { CartManager } from "./controllers/cartManager.js";
+import { app, io} from "./utils/init.js"
 import { MessageModel } from "./models/message.model.js";
 
 //Views
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import viewsRouter  from "./routes/views.router.js";
-import sessionsRouter from "./routes/sessions.router.js";
+import sessionsRouter from "./routes/users.router.js";
 
-//Instancias
-let newProductList = new ProductManager();
-let newCartList = new CartManager();
+import "./utils/init.js";
 
 //Routes
 app.use("/api/products", productsRouter);
@@ -20,6 +16,7 @@ app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
 app.use("/api/sessions", sessionsRouter);
 
+//websocket
 io.on("connection", (socket) => {
     socket.on("message", async (data) => {
         if(data.message === "Bienvenido"){
@@ -33,5 +30,3 @@ io.on("connection", (socket) => {
         }
     });
 });
-
-export {newProductList, newCartList}

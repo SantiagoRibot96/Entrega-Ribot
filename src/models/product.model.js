@@ -33,7 +33,9 @@ const productSchema = new mongoose.Schema({
     },
     status: {
         type: Boolean,
-        required: true
+        required: true,
+        enum: [true, false],
+        default: true
     },
 });
 
