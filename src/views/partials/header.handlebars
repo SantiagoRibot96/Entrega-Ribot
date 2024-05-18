@@ -3,8 +3,12 @@
 
     <nav>
         <ul>
-            <li><a href="/chat"> Hable con un vendedor </a></li>
+            {{#if rol}}
+            <li><a href="/addProduct"> Agregar producto </a></li>
+            {{else}}
             <li><a href="/carts/6625a1307b7c161035e9c6a7"> Mi carrito </a></li>
+            <li><a href="/chat"> Hable con un vendedor </a></li>
+            {{/if}}
             {{#if userName}}
                 <li><a href="/profile">Mi Perfil</a></li>
             {{/if}}

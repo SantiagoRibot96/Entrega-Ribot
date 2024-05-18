@@ -57,7 +57,8 @@ class ProductController {
                 prevLink: products.hasPrevPage ? products.prevPage : null,
                 firstPage,
                 limit,
-                userName: req.user.first_name
+                userName: req.user.first_name, 
+                rol: req.user.rol === "admin" ? 1 : 0
             });
         } catch (error) {
             res.status(500).send(`Error al obtener los productos: ${error}`);
@@ -69,7 +70,7 @@ class ProductController {
             const {title, description, category, price, thumbnail, code, stock} = req.body;
             const newProduct = await productService.addProduct(title, description, category, price, thumbnail, code, stock);
         
-            res.stauts(200).send(`Producto creado ${newProduct}`);
+            res.status(200).send(`Producto creado`);
         } catch (error) {
             res.status(500).send(`Error al crear el producto: ${error}`);
         }

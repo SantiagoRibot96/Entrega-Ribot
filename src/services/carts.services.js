@@ -36,8 +36,7 @@ class CartService {
     async addProductToCart(cid, pid, quantity = 1) {
         try {
             const cart = await this.getCartById(cid);
-
-            const existeProducto = cart.products.find(item => item.product.toString() === pid);
+            const existeProducto = cart.products.find(item => item.product._id.toString() === pid);
 
             if(existeProducto){
                 existeProducto.quantity += quantity;

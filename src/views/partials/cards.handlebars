@@ -6,10 +6,19 @@
                 <h5 class="card-title">{{this.title}}</h5>
                 <p class="card-text">{{this.description}}</p>
                 <p class="card-text">${{this.price}}.-</p>
-                {{#if this.status}}
-                    <button href="/" class="btn btn-primary">Comprar</button>
+                {{#unless this.status}}
+                <p class="card-text" style="color: red;">SIN STOCK</p>
+                {{/unless}}
+                {{#if ../rol}}
+                <button href="/" class="btn btn-primary">Eliminar producto</button>
+                <br><br>
+                <button href="/" class="btn btn-primary">Actualizar producto</button>
                 {{else}}
+                    {{#if this.status}}
+                    <button href="/" class="btn btn-primary">Comprar</button>
+                    {{else}}
                     <button href="#" class="btn btn-secondary" disabled>Sin stock</button>
+                    {{/if}}
                 {{/if}}
             </div>
         </div>

@@ -26,7 +26,7 @@ class CartController {
     async getCartById(req, res) {
         try {
             const cid = req.params.cid;
-
+            const rol = req.user.rol === "admin" ? 1 : 0;
             const cart = await cartService.getCartById(cid);
         
             const products = cart.products.map(item => ({
@@ -34,7 +34,7 @@ class CartController {
                 quantity: item.quantity
             }));
             
-            res.render("carts", {productos: products, userName: req.user.first_name});
+            res.render("carts", {rol, productos: products, userName: req.user.first_name});
         } catch (error) {
             res.status(500).send(`Error al obetener el Cart: ${error}`);
         }
