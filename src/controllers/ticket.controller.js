@@ -23,13 +23,14 @@ class TicketController {
             const cid = req.params.cid;
             const cartSource = await cartService.getCartById(cid);
             const cart = await cartService.getCartById(cid);
+            let cartNew = [];
             let index = 0;
 
             for (const item of cartSource.products) {
                 const product = await productService.getProductById(item.product._id);
 
                 if (product.stock < item.quantity) {
-                    cart.products.splice(index, 1);
+                    cartNew.push(cart.products.splice(index, 1));
                     if(index != 0) index++;
                 }else{
                     product.stock -= item.quantity;
@@ -38,9 +39,10 @@ class TicketController {
                 }
             }
 
+            await cartService.updateCart(cid, cart.products);
             const ticket = await ticketService.generateTicket(cart)
-            res.status(200).send(`Ticket creado codigo: ${ticket.code}`);
-            return ticket;
+            res.status(200).send(`Ticket creado codigo: ${ticket.code} ${cartNew == [] ? "." : "Hay productos que no pudieron ser agregados"}`);
+            return cartNew;
             
         } catch (error) {
             res.status(500).send(`Error al generar los Tickets: ${error}`);
