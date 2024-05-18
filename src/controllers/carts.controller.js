@@ -15,7 +15,9 @@ class CartController {
 
     async addCart(req, res) {
         try {
-            const newCart = await cartService.addCart();
+            const user = req.user.email;
+            console.log(user);
+            const newCart = await cartService.addCart(user);
 
             res.status(200).send(`Cart creado: ${newCart}`);
         } catch (error) {

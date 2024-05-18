@@ -12,20 +12,23 @@ class TicketService {
         }
     }
 
-    async generateTicket(cart, purchaser) {
+    async generateTicket(cart) {
         try {
-            console.log(cart.products);
-            const amount = cart.products.reduce((total, item) => total + item.product.price*item.quantity, 0);
+            if(cart.products[0] != null){
+                const amount = cart.products.reduce((total, item) => total + item.product.price*item.quantity, 0);
 
-            let newTicket = new TicketModel ({
-                code: generateCode(15),
-                purchase_datetime: Date.now(), 
-                amount, 
-                purchaser
-            });
+                let newTicket = new TicketModel ({
+                    code: generateCode(15),
+                    purchase_datetime: Date.now(), 
+                    amount, 
+                    purchaser: cart.user
+                });
 
-            await newTicket.save();
-            return newTicket;
+                await newTicket.save();
+                return newTicket;
+            }else{
+                throw new Error(`No hay productos con suficiente stock en el carrito`);
+            }
         } catch (error) {
             throw new Error(`${error}`);
         }

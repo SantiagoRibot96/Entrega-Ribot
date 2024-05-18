@@ -11,9 +11,9 @@ class CartService {
         }
     }
 
-    async addCart() {
+    async addCart(user) {
         try {
-            const newCart = new CartModel({products: []});
+            const newCart = new CartModel({products: [], user});
 
             await newCart.save();
 

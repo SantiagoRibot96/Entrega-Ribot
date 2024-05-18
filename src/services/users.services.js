@@ -15,7 +15,7 @@ class UserService {
     
             if(user) throw new Error("El usuario ya existe");
     
-            const cart = await cartService.addCart();
+            const cart = await cartService.addCart(email);
     
             let newUser = {
                 first_name,
