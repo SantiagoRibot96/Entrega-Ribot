@@ -3,6 +3,9 @@
 1) `npm install`: Install all dependencies needed to run the project
 2) `npm start`: This will start node app.js
 3) for the requests Postman is being used
+4) There are two users created:
+		- user@user.com: user with role User. Password: 1234
+		- admin@admin.com: user with role Admin. Password: 1234
 
 ## Routes:
 
