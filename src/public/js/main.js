@@ -24,7 +24,7 @@ chatBox.addEventListener("keyup", (event) => {
             chatBox.value = "";
         }
     }
-})
+});
 
 socket.on("messagesLogs", (data) => {
     let log = document.getElementById("messagesLogs");

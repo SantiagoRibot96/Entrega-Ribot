@@ -6,12 +6,11 @@ class ProductController {
     async deleteProduct(req, res) {
         try {
             const pid = req.params.pid;
-    
             const deletedProduct = await productService.deleteProduct(pid);
 
-            res.stauts(200).send(`Producto actualizado ${deletedProduct}`);
+            console.log(`Producto actualizado ${deletedProduct}`);
         } catch (error) {
-            res.status(500).send(`Error al eliminar el producto ${pid}: ${error}`);
+            res.status(500).send(`Error al eliminar el producto: ${error}`);
         }
     }
 
@@ -19,12 +18,13 @@ class ProductController {
         try {
             const pid = req.params.pid;
             const prod = req.body;
-        
+            console.log(`${pid}, ${prod}`);
             const newProduct = await productService.updateProduct(pid, {...prod});
 
-            res.stauts(200).send(`Producto actualizado ${newProduct}`);
+            console.log(`Producto actualizado ${newProduct}`);
+            res.redirect("/products");
         } catch (error) {
-            res.status(500).send(`Error al actualizar el producto ${pid}: ${error}`);
+            res.status(500).send(`Error al actualizar el producto: ${error}`);
         }
     }
 
@@ -43,7 +43,7 @@ class ProductController {
             if(!products.hasPrevPage){
                 firstPage = true;
             }
-            
+
             res.render("home", {
                 status: "success",
                 payload: products.docs,
@@ -58,7 +58,8 @@ class ProductController {
                 firstPage,
                 limit,
                 userName: req.user.first_name, 
-                rol: req.user.rol === "admin" ? 1 : 0
+                rol: req.user.rol === "admin" ? 1 : 0,
+                cid: req.user.cart
             });
         } catch (error) {
             res.status(500).send(`Error al obtener los productos: ${error}`);

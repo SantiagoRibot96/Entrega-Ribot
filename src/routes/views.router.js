@@ -4,16 +4,18 @@ import { isAdmin, isUser } from "../utils/functions.js";
 
 import ProductController from "../controllers/products.controller.js";
 import CartController from "../controllers/carts.controller.js";
+import ProductService from "../services/products.services.js";
 
 const router = express.Router();
 const productController = new ProductController();
 const cartController = new CartController();
+const productService = new ProductService();
 
-router.get("/", passport.authenticate("current", {session: false, failureRedirect: "/tokenLogin"}), (req, res) => {
+router.get("/", (req, res) => {
     res.redirect("/products");
 });
 
-router.get("/products", passport.authenticate("current", {session: false, failureRedirect: "/tokenLogin"}), productController.getProducts);
+router.get("/products", passport.authenticate("current", {session: false, failureRedirect: "/home"}), productController.getProducts);
 
 router.get("/chat", passport.authenticate("current", {session: false, failureRedirect: "/tokenLogin"}), isUser, (req, res) => {
     const rol = req.user.rol === "admin" ? 1 : 0;
@@ -56,5 +58,16 @@ router.get("/profile", passport.authenticate("current", {session: false}), (req,
 
     res.render("profile", {rol: role, user, userName: first_name});
 });
+
+router.get("/home", (req, res) => {
+    res.render("mainPage");
+});
+
+router.get("/updateProducts/:pid", passport.authenticate("current", {session: false, failureRedirect: "/login"}), async (req, res) => {
+    const rol = req.user.rol === "admin" ? 1 : 0;
+    const pid = req.params.pid;
+    const product = await productService.getProductById(pid)
+    res.render("updateProducts", {rol, userName: req.user.first_name, product});
+})
 
 export default router;

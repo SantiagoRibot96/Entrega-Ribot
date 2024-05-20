@@ -14,7 +14,7 @@ class ProductService {
     async updateProduct(pid, newProduct) {
         try {
             const productUpdate = await ProductModel.findByIdAndUpdate(pid, newProduct);
-            
+
             return productUpdate;
         } catch (error) {
             throw new Error(`${error}`);

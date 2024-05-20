@@ -36,7 +36,7 @@ class CartController {
                 quantity: item.quantity
             }));
             
-            res.render("carts", {rol, productos: products, userName: req.user.first_name});
+            res.render("carts", {cid, rol, productos: products, userName: req.user.first_name});
         } catch (error) {
             res.status(500).send(`Error al obetener el Cart: ${error}`);
         }
@@ -50,8 +50,9 @@ class CartController {
             const quantity = req.body.quantity || 1;
         
             const cart = await cartService.addProductToCart(cid, pid, quantity);
-        
-            res.status(200).send(`Cart actualizado: ${cart}`);
+
+            console.log(`Cart actualizado: ${cart}`);
+            res.redirect("/products");
         } catch (error) {
             res.status(500).send(`Error al agregar el producto al Cart: ${error}`);
         }
@@ -64,7 +65,7 @@ class CartController {
         
             const cart = await cartService.deleteProduct(cid, pid);
 
-            res.status(200).send(`Producto eliminado del Cart: ${cart}`);
+            console.log(`Producto eliminado del Cart: ${cart}`);
         } catch (error) {
             res.status(500).send(`Error al eliminar el producto del Cart: ${error}`);
         }

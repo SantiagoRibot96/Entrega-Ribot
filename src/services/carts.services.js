@@ -56,9 +56,10 @@ class CartService {
         try {
             const cart = await this.getCartById(cid);
 
-            const existeProducto = cart.products.findIndex(item => item.product.toString() === pid);
+            const existeProducto = cart.products.findIndex(item => item.product._id.toString() === pid);
 
-            cart.products.splice(existeProducto, 1);
+            if(existeProducto != -1) cart.products.splice(existeProducto, 1);
+            else console.log("No se encontr producto");
             
             cart.markModified("products");
             await cart.save();
