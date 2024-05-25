@@ -1,13 +1,26 @@
 import { ProductModel } from "../models/product.model.js";
+import { CustomError } from "./errors/custom-error.js";
+import { EErrors } from "./errors/enum.js";
+import { getErrorInfo } from "./errors/info.js";
 
 class ProductService {
     async deleteProduct(pid) {
         try {
+            const product = await ProductModel.findById(pid);
             const deletedProduct = await ProductModel.findByIdAndDelete(pid);
+
+            if(!deletedProduct){
+                throw CustomError.createError({
+                    name: "Producto no encontrado",
+                    source: getErrorInfo({title: product.title, _id: pid}, 3),
+                    message: "Error al eliminar un producto",
+                    code: EErrors.NOT_FOUND
+                });
+            }
 
             return deletedProduct;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -15,9 +28,18 @@ class ProductService {
         try {
             const productUpdate = await ProductModel.findByIdAndUpdate(pid, newProduct);
 
+            if(!productUpdate){
+                throw CustomError.createError({
+                    name: "Producto no encontrado",
+                    source: getErrorInfo({title: newProduct.title, _id: pid}, 3),
+                    message: "Error al actualizar un producto",
+                    code: EErrors.NOT_FOUND
+                });
+            }
+
             return productUpdate;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -56,6 +78,15 @@ class ProductService {
 
             const products = await ProductModel.find(queryOptions).sort(sortOptions).skip(skip).limit(limit);
 
+            if(!products){
+                throw CustomError.createError({
+                    name: "No se pudieron obtener productos",
+                    source: getErrorInfo({}, 5),
+                    message: "Error al obtener los producto",
+                    code: EErrors.DB_ERROR
+                });
+            }
+
             const totalProducts = await ProductModel.countDocuments(queryOptions);
 
             const totalPages = Math.ceil(totalProducts / limit);
@@ -73,7 +104,7 @@ class ProductService {
                 nextPage: hasNextPage ? nextLink : null
             };
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -82,6 +113,26 @@ class ProductService {
             let status = true;
 
             if(stock < 1) status = false;
+
+            if(!title || !description || !category || !price || !code){
+                throw CustomError.createError({
+                    name: "Todos los campos son requeridos",
+                    source: getErrorInfo({title, description, category, price, code}, 2),
+                    message: "Error al crear un producto",
+                    code: EErrors.MISSING_FIELDS
+                });
+            }
+
+            const validateCode = await ProductModel.findOne({code});
+
+            if(validateCode){
+                throw CustomError.createError({
+                    name: "Codigo ya utilizado",
+                    source: getErrorInfo({code}, 4),
+                    message: "Error al crear un producto",
+                    code: EErrors.INVALID_CODE
+                });
+            }
 
             let newProduct = new ProductModel ({
                 title,
@@ -98,7 +149,7 @@ class ProductService {
             
             return newProduct;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -106,9 +157,17 @@ class ProductService {
         try {
             const product = await ProductModel.findById(pid);
 
-            if(product) return product;
+            if(product) return product
+            else{
+                throw CustomError.createError({
+                    name: "Producto no encontrado",
+                    source: getErrorInfo({title: "", _id: pid}, 3),
+                    message: "Producto no encontrado",
+                    code: EErrors.NOT_FOUND
+                });
+            }
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 }

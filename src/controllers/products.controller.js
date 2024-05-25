@@ -3,32 +3,31 @@ import ProductService from "../services/products.services.js";
 const productService = new ProductService();
 
 class ProductController {
-    async deleteProduct(req, res) {
+    async deleteProduct(req, res, next) {
         try {
             const pid = req.params.pid;
             const deletedProduct = await productService.deleteProduct(pid);
 
             console.log(`Producto actualizado ${deletedProduct}`);
         } catch (error) {
-            res.status(500).send(`Error al eliminar el producto: ${error}`);
+            next(error);
         }
     }
 
-    async updateProduct(req, res) {
+    async updateProduct(req, res, next) {
         try {
             const pid = req.params.pid;
             const prod = req.body;
-            console.log(`${pid}, ${prod}`);
             const newProduct = await productService.updateProduct(pid, {...prod});
 
             console.log(`Producto actualizado ${newProduct}`);
             res.redirect("/products");
         } catch (error) {
-            res.status(500).send(`Error al actualizar el producto: ${error}`);
+            next(error);
         }
     }
 
-    async getProducts(req, res) {
+    async getProducts(req, res, next) {
         try {
             const { limit = 8, page = 1, sort, query } = req.query;
             let firstPage = false;
@@ -62,29 +61,29 @@ class ProductController {
                 cid: req.user.cart
             });
         } catch (error) {
-            res.status(500).send(`Error al obtener los productos: ${error}`);
+            next(error);
         }
     }
 
-    async addProduct(req, res) {
+    async addProduct(req, res, next) {
         try {
             const {title, description, category, price, thumbnail, code, stock} = req.body;
             const newProduct = await productService.addProduct(title, description, category, price, thumbnail, code, stock);
         
-            res.status(200).send(`Producto creado`);
+            res.status(200).send(`Producto creado ${newProduct}`);
         } catch (error) {
-            res.status(500).send(`Error al crear el producto: ${error}`);
+            next(error);
         }
     }
 
-    async getProductById(req, res) {
+    async getProductById(req, res, next) {
         try {
             const pid = req.params.pid;
             const product = await productService.getProductById(pid);
 
             res.status(200).send(product);
         } catch (error) {
-            res.status(500).send(`Error al obtener el producto ${pid}: ${error}`);
+            next(error);
         }
     }
 }

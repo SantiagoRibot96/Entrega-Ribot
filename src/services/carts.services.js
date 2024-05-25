@@ -1,13 +1,25 @@
 import { CartModel } from "../models/cart.model.js";
+import { CustomError } from "./errors/custom-error.js";
+import { EErrors } from "./errors/enum.js";
+import { getErrorInfo } from "./errors/info.js";
 
 class CartService {
     async getCarts() {
         try {
             const carts = await CartModel.find();
 
+            if(!carts){
+                throw CustomError.createError({
+                    name: "Carritos no encontrados",
+                    source: getErrorInfo({}, 5),
+                    message: "Error al obtener los carritos",
+                    code: EErrors.DB_ERROR
+                });
+            }
+            
             return carts;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -15,11 +27,20 @@ class CartService {
         try {
             const newCart = new CartModel({products: [], user});
 
+            if(!newCart){
+                throw CustomError.createError({
+                    name: "Carritos no creado",
+                    source: getErrorInfo({}, 5),
+                    message: "Error al crear un carrito",
+                    code: EErrors.DB_ERROR
+                });
+            }
+
             await newCart.save();
 
             return newCart;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -27,9 +48,18 @@ class CartService {
         try {
             const cart = await CartModel.findById(cid);
 
+            if(!carts){
+                throw CustomError.createError({
+                    name: "Carrito no encontrado",
+                    source: getErrorInfo({cid}, 6),
+                    message: "Error al obtener el carrito",
+                    code: EErrors.NOT_FOUND
+                });
+            }
+
             return cart;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -48,7 +78,7 @@ class CartService {
             await cart.save();
             return cart;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -58,14 +88,21 @@ class CartService {
 
             const existeProducto = cart.products.findIndex(item => item.product._id.toString() === pid);
 
-            if(existeProducto != -1) cart.products.splice(existeProducto, 1);
-            else console.log("No se encontr producto");
+            if(existeProducto != -1) cart.products.splice(existeProducto, 1)
+            else {
+                throw CustomError.createError({
+                    name: "Producto no encontrado",
+                    source: getErrorInfo({title: "", _id: pid}, 3),
+                    message: "Error al obtener los carritos",
+                    code: EErrors.DB_ERROR
+                });
+            };
             
             cart.markModified("products");
             await cart.save();
             return cart;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -79,7 +116,7 @@ class CartService {
             await cart.save();
             return cart;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -95,7 +132,7 @@ class CartService {
             await cart.save();
             return cart;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 
@@ -103,9 +140,18 @@ class CartService {
         try {
             const deletedCart = await CartModel.findByIdAndDelete(cid);
             
+            if(!deletedCart){
+                throw CustomError.createError({
+                    name: "Carrito no encontrado",
+                    source: getErrorInfo({}, 5),
+                    message: "Error al eliminar un carrito",
+                    code: EErrors.DB_ERROR
+                });
+            }
+
             return deletedCart;
         } catch (error) {
-            throw new Error(`${error}`);
+            throw error;
         }
     }
 }

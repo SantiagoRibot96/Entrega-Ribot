@@ -41,6 +41,7 @@
 - POST http://localhost:8080/api/carts/:cid/product/:pid : charges on the cid cart given the pid product, only if the product exists on the product list and if there is stock.
 - Connect to http://localhost:8080 from browser to display all products
 - Connect to http://localhost:8080/realtimeproducts to display all products in real time. If you post a new product, it will appear
+- For Mocking, http://localhost:8080/mockingproducts/
 
 ## Tecnologies:
 
@@ -60,3 +61,4 @@
 - Cookies
 - Json Web Token
 - Mailing
+- Moking

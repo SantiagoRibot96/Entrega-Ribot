@@ -1,6 +1,7 @@
 //Modules
 import { app, io} from "./utils/init.js"
 import { MessageModel } from "./models/message.model.js";
+import { errorHandler } from "./middleware/error.js";
 
 //Views
 import productsRouter from "./routes/products.router.js";
@@ -15,6 +16,8 @@ app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
 app.use("/api/sessions", sessionsRouter);
+
+app.use(errorHandler);
 
 //websocket
 io.on("connection", (socket) => {

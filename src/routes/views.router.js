@@ -1,10 +1,11 @@
 import express from "express";
 import passport from "passport";
-import { isAdmin, isUser } from "../utils/functions.js";
+import { isAdmin, isUser } from "../middleware/roles.js";
 
 import ProductController from "../controllers/products.controller.js";
 import CartController from "../controllers/carts.controller.js";
 import ProductService from "../services/products.services.js";
+import { generarProductos } from "../utils/moks.js";
 
 const router = express.Router();
 const productController = new ProductController();
@@ -68,6 +69,19 @@ router.get("/updateProducts/:pid", passport.authenticate("current", {session: fa
     const pid = req.params.pid;
     const product = await productService.getProductById(pid)
     res.render("updateProducts", {rol, userName: req.user.first_name, product});
-})
+});
+
+router.get("/mockingproducts", async (req, res) => {
+    const productos = [];
+
+    for(let i = 0; i < 100; i++) {
+        productos.push(generarProductos());
+    }
+
+    res.render("mocking", {
+        status: "success",
+        payload: productos,
+    });
+});
 
 export default router;

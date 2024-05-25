@@ -3,17 +3,17 @@ import CartService from "../services/carts.services.js";
 const cartService = new CartService();
 
 class CartController {
-    async getCarts(req, res) {
+    async getCarts(req, res, next) {
         try {
             const carts = await cartService.getCarts();
 
             res.status(200).send(`Cart creado: ${carts}`);
         } catch (error) {
-            res.status(500).send(`Error al obtener los Carts: ${error}`);
+            next(error);
         }
     }
 
-    async addCart(req, res) {
+    async addCart(req, res, next) {
         try {
             const user = req.user.email;
             console.log(user);
@@ -21,11 +21,11 @@ class CartController {
 
             res.status(200).send(`Cart creado: ${newCart}`);
         } catch (error) {
-            res.status(500).send(`Error al crear el Cart: ${error}`);
+            next(error);
         }
     }
 
-    async getCartById(req, res) {
+    async getCartById(req, res, next) {
         try {
             const cid = req.params.cid;
             const rol = req.user.rol === "admin" ? 1 : 0;
@@ -38,12 +38,12 @@ class CartController {
             
             res.render("carts", {cid, rol, productos: products, userName: req.user.first_name});
         } catch (error) {
-            res.status(500).send(`Error al obetener el Cart: ${error}`);
+            next(error);
         }
 
     }
 
-    async addProductToCart(req, res) {
+    async addProductToCart(req, res, next) {
         try {
             const cid = req.params.cid;
             const pid = req.params.pid;
@@ -54,11 +54,11 @@ class CartController {
             console.log(`Cart actualizado: ${cart}`);
             res.redirect("/products");
         } catch (error) {
-            res.status(500).send(`Error al agregar el producto al Cart: ${error}`);
+            next(error);
         }
     }
 
-    async deleteProduct(req, res) {
+    async deleteProduct(req, res, next) {
         try {
             const cid = req.params.cid;
             const pid = req.params.pid;
@@ -67,11 +67,11 @@ class CartController {
 
             console.log(`Producto eliminado del Cart: ${cart}`);
         } catch (error) {
-            res.status(500).send(`Error al eliminar el producto del Cart: ${error}`);
+            next(error);
         }
     }
 
-    async updateCart(req, res){
+    async updateCart(req, res, next){
         try {
             const cid = req.params.cid;
             const updatedProducts = req.body;
@@ -80,11 +80,11 @@ class CartController {
             
             res.status(200).send(`Cart actualizado: ${updatedCart}`);
         } catch (error) {
-            res.status(500).send(`No se pudo actualizar el Cart: ${error}`);
+            next(error);
         }
     }
 
-    async updateProduct(req, res){
+    async updateProduct(req, res, next){
         try {
             const cid = req.params.cid;
             const pid = req.params.pid;
@@ -94,18 +94,18 @@ class CartController {
             
             res.status(200).send(`Cart actualizado: ${updatedCart}`);
         } catch (error) {
-            res.status(500).send(`No se pudo actualizar el Cart: ${error}`);
+            next(error);
         }
     }
 
-    async deleteCart(req, res){
+    async deleteCart(req, res, next){
         try {
             const cid = req.params.cid;
             const deletedCart = await cartService.deleteCart(cid);
 
             res.status(200).send(`El carrito ha sido eliminado: ${deletedCart}`);
         } catch (error) {
-            res.status(500).send(`No se pudo eliminar el Cart: ${error}`);
+            next(error);
         }
     }
 }
