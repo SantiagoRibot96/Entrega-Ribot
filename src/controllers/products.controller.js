@@ -8,7 +8,8 @@ class ProductController {
             const pid = req.params.pid;
             const deletedProduct = await productService.deleteProduct(pid);
 
-            console.log(`Producto actualizado ${deletedProduct}`);
+            req.logger.info(`Producto actualizado ${deletedProduct}`);
+            // console.log(`Producto actualizado ${deletedProduct}`);
         } catch (error) {
             next(error);
         }
@@ -20,7 +21,8 @@ class ProductController {
             const prod = req.body;
             const newProduct = await productService.updateProduct(pid, {...prod});
 
-            console.log(`Producto actualizado ${newProduct}`);
+            req.logger.info(`Producto actualizado ${newProduct}`)
+            // console.log(`Producto actualizado ${newProduct}`);
             res.redirect("/products");
         } catch (error) {
             next(error);
@@ -70,7 +72,8 @@ class ProductController {
             const {title, description, category, price, thumbnail, code, stock} = req.body;
             const newProduct = await productService.addProduct(title, description, category, price, thumbnail, code, stock);
         
-            res.status(200).send(`Producto creado ${newProduct}`);
+            req.logger.info(`Producto creado ${newProduct}`);
+            // res.status(200).send(`Producto creado ${newProduct}`);
         } catch (error) {
             next(error);
         }
@@ -81,7 +84,8 @@ class ProductController {
             const pid = req.params.pid;
             const product = await productService.getProductById(pid);
 
-            res.status(200).send(product);
+            req.logger.info(product);
+            // res.status(200).send(product);
         } catch (error) {
             next(error);
         }

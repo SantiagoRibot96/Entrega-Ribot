@@ -18,7 +18,8 @@ class UserController {
     
             res.redirect("/products");
         } catch (error) {
-            res.status(500).send(`No se pudo registrar el usuario: ${error}`);
+            req.logger.error(`No se pudo registrar el usuario: ${error}`);
+            // res.status(500).send(`No se pudo registrar el usuario: ${error}`);
         }
     }
 
@@ -34,7 +35,8 @@ class UserController {
         
             res.redirect("/products");
         } catch (error) {
-            res.status(500).send(`No se pudo obtener el usuario: ${error}`);
+            req.logger.error(`No se pudo obtener el usuario: ${error}`);
+            // res.status(500).send(`No se pudo obtener el usuario: ${error}`);
         }
     }
 
@@ -53,7 +55,8 @@ class UserController {
         
             res.redirect("/products");
         } catch (error) {
-            res.status(500).send(`No se pudo generar el token: ${error}`);
+            req.logger.error(`No se pudo generar el token: ${error}`);
+            // res.status(500).send(`No se pudo generar el token: ${error}`);
         }
     }
 

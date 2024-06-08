@@ -10,6 +10,7 @@ import { Server } from "socket.io";
 import "../database.js";
 import "../config/config.js";
 import initializePassport from "../config/passport.config.js";
+import addLogger from "./logger.js";
 
 export const app = express();
 export const PORT = 8080;
@@ -43,6 +44,8 @@ app.use(cookieParser());
 
 app.use(passport.initialize());
 initializePassport();
+
+app.use(addLogger);
 
 //Listen server
 const httpServer = app.listen(PORT, () => {

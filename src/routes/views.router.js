@@ -84,4 +84,14 @@ router.get("/mockingproducts", async (req, res) => {
     });
 });
 
+router.get("/loggerTest", (req, res) => {
+    req.logger.fatal("Mensaje de error fatal");
+    req.logger.debug("Mensaje de debug");
+    req.logger.http("Mensaje de HTTP");
+    req.logger.warning("Mensaje de warning");
+    req.logger.info("Mensaje de info");
+    req.logger.error("Mensaje de error");
+
+    res.send("Logs generados");
+});
 export default router;

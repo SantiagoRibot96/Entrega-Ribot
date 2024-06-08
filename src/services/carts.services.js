@@ -48,7 +48,7 @@ class CartService {
         try {
             const cart = await CartModel.findById(cid);
 
-            if(!carts){
+            if(!cart){
                 throw CustomError.createError({
                     name: "Carrito no encontrado",
                     source: getErrorInfo({cid}, 6),

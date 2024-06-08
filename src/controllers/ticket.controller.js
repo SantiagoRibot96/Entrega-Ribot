@@ -12,9 +12,11 @@ class TicketController {
             const tid = req.params.tid;
             const deletedTicket = await cartService.deleteCart(tid);
 
-            res.status(200).send(`El ticket ha sido eliminado: ${deletedTicket}`);
+            req.logger.info(`El ticket ha sido eliminado: ${deletedTicket}`);
+            // res.status(200).send(`El ticket ha sido eliminado: ${deletedTicket}`);
         } catch (error) {
-            res.status(500).send(`No se pudo eliminar el Ticket: ${error}`);
+            req.logger.error(`No se pudo eliminar el Ticket: ${error}`)
+            // res.status(500).send(`No se pudo eliminar el Ticket: ${error}`);
         }
     }
 
@@ -43,11 +45,14 @@ class TicketController {
 
             if(flag) await cartService.updateCart(cid, cartNew);
             const ticket = await ticketService.generateTicket(cart);
-            console.log(`Ticket creado codigo: ${ticket.code} ${!flag ? "." : "Hay productos que no pudieron ser agregados"}`);
+
+            req.logger.info(`Ticket creado codigo: ${ticket.code} ${!flag ? "." : "Hay productos que no pudieron ser agregados"}`);
+            // console.log(`Ticket creado codigo: ${ticket.code} ${!flag ? "." : "Hay productos que no pudieron ser agregados"}`);
             res.render("ticketGenerado", {ticket: ticket.code, amount: ticket.amount, productos: cart.products});
 
         } catch (error) {
-            res.status(500).send(`Error al generar los Tickets: ${error}`);
+            req.logger.error(`Error al generar los Tickets: ${error}`);
+            // res.status(500).send(`Error al generar los Tickets: ${error}`);
         }
     }
 
@@ -55,9 +60,11 @@ class TicketController {
         try {
             const tickets = await ticketService.getTickets();
 
-            res.status(200).send(`Ticket creado: ${tickets}`);
+            req.logger.info(`Ticket creado: ${tickets}`);
+            // res.status(200).send(`Ticket creado: ${tickets}`);
         } catch (error) {
-            res.status(500).send(`Error al obtener los Tickets: ${error}`);
+            req.logger.error(`Error al obtener los Tickets: ${error}`);
+            // res.status(500).send(`Error al obtener los Tickets: ${error}`);
         }
     }
 }
