@@ -22,4 +22,7 @@ router.get("/githubcallback", passport.authenticate("github", {
     failureRedirect: "/login"
 }), userController.githubToken);
 
+router.post("/requestPasswordReset", userController.requestPasswordReset);
+router.post("/reset-password", userController.resetPassword);
+router.get("/premium/:uid", userController.changeRol);
 export default router;

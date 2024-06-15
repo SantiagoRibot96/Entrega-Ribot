@@ -1,11 +1,11 @@
 import express from "express";
 import passport from "passport";
-import { isAdmin, isUser } from "../middleware/roles.js";
 
 import ProductController from "../controllers/products.controller.js";
 import CartController from "../controllers/carts.controller.js";
 import ProductService from "../services/products.services.js";
 import { generarProductos } from "../utils/moks.js";
+import { isAdmin, isUser, isPremium} from "../middleware/roles.js";
 
 const router = express.Router();
 const productController = new ProductController();
@@ -94,4 +94,18 @@ router.get("/loggerTest", (req, res) => {
 
     res.send("Logs generados");
 });
+
+router.get("/reset-password", (req, res) => {
+    res.render("resetPassword");
+});
+
+router.get("/password", (req, res) => {
+    res.render("changePassword");
+});
+
+router.get("/premiumPanel", passport.authenticate("current", {session: false, failureRedirect: "/login"}), isPremium, async (req, res) => {
+    const products = await productService.getProductsByOwner(req.user._id);
+    res.render("premiumPanel", {userProducts: products});
+})
+
 export default router;

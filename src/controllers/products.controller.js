@@ -69,8 +69,8 @@ class ProductController {
 
     async addProduct(req, res, next) {
         try {
-            const {title, description, category, price, thumbnail, code, stock} = req.body;
-            const newProduct = await productService.addProduct(title, description, category, price, thumbnail, code, stock);
+            const product = req.body;
+            const newProduct = await productService.addProduct(product);
         
             req.logger.info(`Producto creado ${newProduct}`);
             // res.status(200).send(`Producto creado ${newProduct}`);

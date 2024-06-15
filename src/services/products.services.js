@@ -108,7 +108,7 @@ class ProductService {
         }
     }
 
-    async addProduct(title, description, category, price, thumbnail, code, stock) {
+    async addProduct({title, description, category, price, thumbnail, code, stock, owner}) {
         try {
             let status = true;
 
@@ -139,10 +139,11 @@ class ProductService {
                 description,
                 category,
                 price,
-                thumbnail,
+                thumbnail: thumbnail || [],
                 code,
                 stock,
-                status
+                status,
+                owner
             });
 
             await newProduct.save();
@@ -168,6 +169,15 @@ class ProductService {
             }
         } catch (error) {
             throw error;
+        }
+    }
+
+    async getProductsByOwner(owner) {
+        try {
+            const products = await ProductModel.find({owner});
+            return products;
+        } catch (error) {
+            next(error);
         }
     }
 }
