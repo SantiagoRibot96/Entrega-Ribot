@@ -132,9 +132,9 @@ class UserController {
 
     async changeRol(req, res) {
         try {
-            const { uid } = req.params;
+            const { umail } = req.params;
     
-            const user = await UserModel.findById(uid);
+            const user = await UserModel.findOne({email: umail});
     
             if (!user) {
                 return res.status(404).send('Usuario no encontrado');
@@ -142,7 +142,7 @@ class UserController {
     
             // const nuevoRol = user.rol === 'user' ? 'premium' : 'user';
     
-            const actualizado = await UserModel.findByIdAndUpdate(uid, { rol: "premium" }, { new: true });
+            const actualizado = await UserModel.findByIdAndUpdate(user._id, { rol: "premium" }, { new: true });
             res.json(actualizado);
         } catch (error) {
             console.error(error);

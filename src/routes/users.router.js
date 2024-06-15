@@ -24,5 +24,5 @@ router.get("/githubcallback", passport.authenticate("github", {
 
 router.post("/requestPasswordReset", userController.requestPasswordReset);
 router.post("/reset-password", userController.resetPassword);
-router.get("/premium/:uid", userController.changeRol);
+router.get("/premium/:umail", userController.changeRol);
 export default router;
