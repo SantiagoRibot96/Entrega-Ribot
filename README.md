@@ -62,3 +62,4 @@
 - Json Web Token
 - Mailing
 - Moking
+- Swagger

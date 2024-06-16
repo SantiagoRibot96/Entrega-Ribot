@@ -5,8 +5,10 @@ import passport from "passport";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import { Server } from "socket.io";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUiExpress from "swagger-ui-express";
 
+import { Server } from "socket.io";
 import "../database.js";
 import "../config/config.js";
 import initializePassport from "../config/passport.config.js";
@@ -46,6 +48,22 @@ app.use(passport.initialize());
 initializePassport();
 
 app.use(addLogger);
+
+//Swagger
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.1",
+        info: {
+            title: "Documentación del Ecommerce de Ribot", 
+            description: "App para venta de productos al por menor"
+        }
+    },
+    apis: ["./src/docs/**/*.yaml"]
+}
+
+const specs = swaggerJSDoc(swaggerOptions);
+
+app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 //Listen server
 const httpServer = app.listen(PORT, () => {
