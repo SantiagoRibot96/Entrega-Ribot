@@ -61,6 +61,16 @@ class UserService {
             throw new Error(`${error}`);
         }
     }
+
+    async deleteUser(email) {
+        try {
+            const deletedUser = await UserModel.deleteOne({email});
+
+            return deletedUser;
+        } catch (error) {
+            throw new Error(`${error}`);
+        }
+    }
 }
 
 export default UserService;
