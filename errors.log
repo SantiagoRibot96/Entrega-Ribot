@@ -30,3 +30,5 @@ error: Error desconocido
 error: Codigo ya utilizado: Codigo 2192kjs ya existe
 error: Error desconocido
 error: Error desconocido
+error: No se pudo registrar el usuario: Error: TypeError: Cannot read properties of null (reading '_id')
+error: No se pudo registrar el usuario: Error: Error: El usuario ya existe

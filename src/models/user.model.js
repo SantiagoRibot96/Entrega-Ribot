@@ -34,6 +34,13 @@ const userSchema = new mongoose.Schema({
     resetToken: {
         token: String,
         expiresAt: Date
+    },
+    documents: {
+        type: Array,
+        default: []
+    },
+    last_connection: {
+        type: Date,
     }
 });
 

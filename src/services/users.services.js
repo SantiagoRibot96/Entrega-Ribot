@@ -26,9 +26,11 @@ class UserService {
                 cart: cart._id
             }
     
-            await UserModel.create(newUser);
+            user = await UserModel.create(newUser);
             
             const token = jwt.sign({email}, token_pass, {expiresIn: "1h"});
+
+            await UserModel.findByIdAndUpdate(user._id, {last_connection: new Date()});
 
             return token;
         } catch (error) {
@@ -45,6 +47,8 @@ class UserService {
             if(!isValidPassword(password, user)) throw new Error("Usuario y contraseña no coinciden");
     
             const token = jwt.sign({email}, token_pass, {expiresIn: "1h"});
+
+            await UserModel.findByIdAndUpdate(user._id, {last_connection: new Date()});
 
             return token;
         } catch (error) {
@@ -67,6 +71,18 @@ class UserService {
             const deletedUser = await UserModel.deleteOne({email});
 
             return deletedUser;
+        } catch (error) {
+            throw new Error(`${error}`);
+        }
+    }
+
+    async updateDocs(uid, doc){
+        try {
+            const user = await UserModel.findById(uid);
+
+            const docsArray = user.documents;
+            docsArray.push(doc);
+            await UserModel.findByIdAndUpdate(uid, {documents: docsArray});
         } catch (error) {
             throw new Error(`${error}`);
         }

@@ -149,6 +149,39 @@ class UserController {
             res.status(500).json({ message: 'Error interno del servidor' });
         }
     }
+
+    async uploadDocuments(req, res) {
+        try {
+            const { umail } = req.params;
+            const user = await UserModel.findOne({email: umail});
+
+            if(!user){
+                return res.status(404).send(`Usuario no encontrado`);
+            }
+            
+            const doc = {
+                name: req.files.document[0].filename,
+                reference: req.files.document[0].path
+            }
+            const prod = {
+                name: req.files.product[0].filename,
+                reference: req.files.product[0].path
+            }
+            const prof = {
+                name: req.files.profile[0].filename,
+                reference: req.files.profile[0].path
+            }
+
+            await userService.updateDocs(user._id, doc);
+            await userService.updateDocs(user._id, prod);
+            await userService.updateDocs(user._id, prof);
+
+            res.status(200).send('Archivo cargado y guardado correctamente');
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: `Error interno del servidor`});
+        }
+    }
 }
 
 export default UserController;
